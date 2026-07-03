@@ -1,0 +1,5 @@
+# Sample binary input for dnasolver.py
+# This file contains a short example bitstring. Each 2 bits -> 1 DNA base.
+# Example: "000000" -> DNA "AAA" -> 6-bit value 0 -> Base64 character 'A'
+
+000000

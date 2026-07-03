@@ -1,10 +1,10 @@
-# DNA Cryptography — Binary → DNA → ASCII Decoder
+# DNA Cryptography — Binary → DNA → Base64-char Decoder
 
-A small Python utility that decodes a binary string by interpreting it as DNA bases and then translating DNA codons to ASCII-like characters.
+A small Python utility that decodes a binary string by interpreting it as DNA bases and then translating DNA codons to printable characters.
 
 This repository demonstrates a simple two-stage decoding pipeline often seen in CTFs and steganography puzzles:
 
-Binary (bits) → DNA bases (A, G, C, T) → Characters (via 3-base codons)
+Binary (bits) → DNA bases (A, G, C, T) → 6-bit codons → Base64 character
 
 Why this exists
 - Educational / puzzle purpose: shows how compact binary data can be reinterpreted as biological codons for fun encodings.
@@ -12,8 +12,9 @@ Why this exists
 
 Contents
 
-- `dnasolver.py` — main Python script. Reads `dna.txt`, converts binary to DNA bases, then maps codons (3 bases) to characters using an internal codon table.
-- `dna.txt` — example input file containing the binary string to decode.
+- `dnasolver.py` — main Python script. Reads `dna.txt` (or a file you pass), converts binary to DNA bases, then maps codons (3 bases) to characters using a 6-bit conversion into the Base64 alphabet.
+- `dna.txt` — (not modified) your input file containing the binary string to decode.
+- `sample_dna.txt` — a tiny example input you can use to verify the script.
 
 Requirements
 
@@ -21,21 +22,20 @@ Requirements
 
 Quick start
 
-1. Put your input binary bitstring in `dna.txt`. The file should contain only `0` and `1` characters (whitespace is ignored).
+1. Put your input binary bitstring in `dna.txt` (or use `sample_dna.txt`). The file may contain whitespace; only `0` and `1` characters are used.
 2. Run the script:
 
 ```bash
-python3 dnasolver.py
+python3 dnasolver.py           # reads dna.txt
+python3 dnasolver.py -i sample_dna.txt --output-only
 ```
 
-The script prints two lines:
-- The DNA string produced from the binary input (each 2 bits → 1 DNA base)
-- The decoded string produced by translating every 3 DNA bases (a codon) to a character using the script's codon table
+The script prints either a short, human-friendly report or just the decoded output when `--output-only` is used.
 
 How it works (short)
 
 1. Binary → DNA
-   - The script reads `dna.txt`, removes whitespace, and processes it in 2-bit chunks.
+   - The script reads `dna.txt`, keeps only `0` and `1` characters, and processes the string in 2-bit chunks.
    - Mapping used in `dnasolver.py`:
      - `00` → `A`
      - `01` → `G`
@@ -44,28 +44,23 @@ How it works (short)
 
 2. DNA → Characters
    - The DNA string is processed in codons (groups of 3 bases).
-   - Each codon is looked up in an internal `tripletMapping` dictionary and mapped to a character. This mapping is defined in `dnasolver.py` and can be adjusted if you want a different alphabet or encoding.
+   - Each codon represents 6 bits (2 bits per base). Those 6 bits are interpreted as a number 0–63 and mapped to the Base64 alphabet (`A–Z a–z 0–9 + /`).
 
 Notes and tips
 
-- The script is intentionally tiny and straightforward for educational/CTF use. It does minimal validation — if your input length isn't a multiple of 2 (for binary→DNA) or if the final DNA length isn't a multiple of 3 (for codon→char), you may get truncated output or KeyError on unknown codons.
-- To adapt the script:
-  - Change `dna.txt` path or pass an argument (currently the script reads `dna.txt` in the repo root).
-  - Replace or extend `tripletMapping` in `dnasolver.py` to map codons to a different character set (full ASCII, punctuation, etc.).
-
-References
-
-- Visual codon diagrams used as inspiration:
-  - https://raw.githubusercontent.com/JohnHammond/ctf-katana/master/img/dna_codes.png
-  - https://raw.githubusercontent.com/JohnHammond/ctf-katana/master/img/genome-coding.jpg
+- The script is intentionally small and straightforward. It performs basic validation:
+  - Non `0/1` characters in the input are ignored.
+  - If the input length isn't a multiple of 2, the final bit is truncated.
+  - Incomplete final codons (fewer than 3 DNA bases) are ignored.
+- Use `--ignore-unknown-bases` to silently drop codons containing unexpected bases.
 
 Contributing
 
-This repository is a tiny demo. If you have improvements (CLI arguments, input validation, unit tests, or an expanded codon table), feel free to open a PR or suggest changes.
+If you want CLI features, alternate output encodings (e.g. produce raw bytes from the 6-bit stream), or unit tests, open a PR or suggest changes.
 
 License
 
-This repository does not include an explicit license file. If you want to reuse this code, please check with the repository owner or add a LICENSE file.
+This project is available under the MIT License (see LICENSE).
 
 Author
 
