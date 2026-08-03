@@ -1,4 +1,5 @@
 # DNA Cryptography — Binary → DNA → Base64-char Decoder
+<img width="1292" height="726" alt="1_7YIe9DtGKHzwz0HI3_BJEA" src="https://github.com/user-attachments/assets/e8ace1af-f78e-4ec8-bd3c-eaaba4976e0c" />
 
 A small Python utility that decodes a binary string by interpreting it as DNA bases and then translating DNA codons to printable characters.
 
